@@ -1,0 +1,312 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Inter", sans-serif;
+    background-color: #f9fafb;
+    color: #111;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+/* header */
+.main-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.logo {
+    display: flex;
+    /* justify-content: center; */
+    align-items: center;
+    gap: 5px;
+    font-size: 22px;
+    font-weight: 600;
+    color: #3445f5;
+}
+
+.logo img {
+    height: 64px;
+}
+
+/* main */
+.main-content {
+    margin-top: 40px;
+}
+
+/* Section headings */
+h1,
+h2 {
+    font-size: 32px;
+    margin-bottom: 16px;
+    color: #111;
+}
+
+/* Progress crads */
+.flexhabits{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 20px;
+}
+.progress-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+
+
+.circular-wrapper {
+    position: relative;
+    width: 140px;
+    height: 140px;
+}
+
+.circular-wrapper canvas {
+    width: 140px;
+    height: 140px;
+}
+
+.circular-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 22px;
+    font-weight: bold;
+    color: #3b82f6;
+}
+
+.progress-message {
+    margin-top: 10px;
+    font-style: italic;
+    color: #555;
+    font-size: 14px;
+    text-align: center;
+}
+
+
+/* Goal Cards */
+
+
+.card {
+    background-color: #f3f4f6;
+    padding: 16px;
+    border-radius: 12px;
+    text-align: center;
+    flex: 1;
+    font-size: 14px;
+    box-shadow: none;
+    color: #333;
+}
+
+.card strong {
+    display: block;
+    font-size: 16px;
+    margin-top: 4px;
+    color: #111;
+}
+
+/* Add Habit Form */
+#habit-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+#habit-form input,
+#habit-form button {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+#habit-form input {
+    background: #f9fafb;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px 16px;
+    width: 200px;
+}
+
+#habit-form button {
+    background: #2563eb;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+
+/* Habit Cards */
+.habit-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 10px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.custom-checkbox {
+    width: 18px;
+    height: 18px;
+    accent-color: #3b82f6;
+    margin-right: 12px;
+}
+
+.habit-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    margin-left: 6px;
+}
+
+.done {
+    text-decoration: line-through;
+    color: #999;
+}
+
+/* insights */
+ 
+.flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+} 
+
+/* ---------- Insights Section Styling ---------- */
+.insights {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 40px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.insights h2 {
+  font-size: 24px;
+  margin-bottom: 16px;
+  color: #111;
+  text-align: center;
+}
+
+/* Chart container layout */
+.insight-charts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Chart containers */
+.chart-box {
+  position: relative;
+  background-color: #f9fafb;
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Circular chart */
+.circular-box {
+  width: 140px;
+  height: 140px;
+}
+
+.circular-box canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Bar chart */
+.bar-chart-box {
+  width: 400px;
+  height: 200px;
+}
+
+.bar-chart-box canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Completion text */
+.insights .completion {
+  font-size: 16px;
+  text-align: center;
+  background-color: #f3f4f6;
+  padding: 10px;
+  border-radius: 8px;
+  color: #1f2937;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  margin-top: 20px;
+}
+
+
+
+/* Achievements */
+.achievements {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 40px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.achievements .badges {
+    font-size: 24px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+
+/* footer */
+footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 14px;
+}
+
+footer a {
+    margin: 0 10px;
+    color: #666;
+    text-decoration: none;
+}
+
+
+/* Mobile Device */
+@media(max-width:767px) {
+    #habit-form {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .insight-chart-box {
+        height: 220px;
+    }
+}
