@@ -30,23 +30,45 @@ document.addEventListener("DOMContentLoaded", () => {
     let habits = JSON.parse(localStorage.getItem("habits")) || [];
     let activityLog = JSON.parse(localStorage.getItem("habitLog")) || {}; // ✅ Daily log
 
+    const streakData = JSON.parse(localStorage.getItem("streakData")) || { streakCount: 0 };
+    document.getElementById("streak-count").innerText = streakData.streakCount;
+
+
     let circularChart;
     let insightChart;
     let habitBarChart;
+    let isEditing = false;
+    let editHabitId = null;
+
 
     habitForm.addEventListener("submit", function (e) {
         e.preventDefault();
         const name = document.getElementById("habit-name").value;
         const icon = document.getElementById("habit-icon").value || "✅";
 
-        const newHabit = {
-            id: Date.now(),
-            name,
-            icon,
-            done: false
-        };
+        if (isEditing) {
+            // Update existing habit
+            habits = habits.map(habit => {
+                if (habit.id === editHabitId) {
+                    return { ...habit, name, icon };
+                }
+                return habit;
+            });
+            isEditing = false;
+            editHabitId = null;
+            habitForm.querySelector("button").textContent = "Add";
+        } else {
+            // Create new habit
+            const newHabit = {
+                id: Date.now(),
+                name,
+                icon,
+                done: false,
+                createdAt: new Date().toISOString()
+            };
+            habits.push(newHabit);
+        }
 
-        habits.push(newHabit);
         saveAndRenderHabits();
         habitForm.reset();
     });
@@ -72,11 +94,102 @@ document.addEventListener("DOMContentLoaded", () => {
         saveAndRenderHabits();
     }
 
+    function startEditHabit(habit) {
+        document.getElementById("habit-name").value = habit.name;
+        document.getElementById("habit-icon").value = habit.icon;
+        isEditing = true;
+        editHabitId = habit.id;
+        habitForm.querySelector("button").textContent = "Update";
+    }
+
+    function updateAchievements(doneCount, streak) {
+        const unlocked = JSON.parse(localStorage.getItem("achievements")) || [];
+        const newlyUnlocked = [];
+
+        if (!unlocked.includes("first_habit") && habits.length >= 1) {
+            newlyUnlocked.push("first_habit");
+        }
+
+        if (!unlocked.includes("streak_3") && streak >= 3) {
+            newlyUnlocked.push("streak_3");
+        }
+
+        if (!unlocked.includes("complete_10") && doneCount >= 10) {
+            newlyUnlocked.push("complete_10");
+        }
+
+        const updated = [...new Set([...unlocked, ...newlyUnlocked])];
+        localStorage.setItem("achievements", JSON.stringify(updated));
+        renderAchievements(updated);
+
+        // 🎉 Show toast for each newly unlocked achievement
+        newlyUnlocked.forEach(id => {
+            switch (id) {
+                case "first_habit":
+                    showToast("🎉 Unlocked: First Habit!");
+                    break;
+                case "streak_3":
+                    showToast("🔥 Unlocked: 3-Day Streak!");
+                    break;
+                case "complete_10":
+                    showToast("🏆 Unlocked: Completed 10 Habits!");
+                    break;
+            }
+        });
+
+        renderAchievements(updated);
+    }
+
+    function renderAchievements(achievements) {
+        
+        const container = document.getElementById("achievement-badges");
+
+        if (!container) {
+            console.error("Missing #achievement-badges in DOM");
+            return;
+        }
+
+        if (!achievements.length) {
+            container.innerText = "None Yet 😢";
+            return;
+        }
+
+        container.innerHTML = achievements.map(id => {
+            switch (id) {
+                case "first_habit": return "🥇";
+                case "streak_3": return "🔥";
+                case "complete_10": return "✅";
+                default: return "";
+            }
+        }).join(" ");
+    }
+
+
+
     function saveAndRenderHabits() {
+        const today = new Date().toISOString().split("T")[0];
+        let streakLog = JSON.parse(localStorage.getItem("streakLog")) || [];
+
+        const doneToday = habits.some(h => h.done);
+
+        if (doneToday) {
+            if (!streakLog.includes(today)) {
+                streakLog.push(today);
+            }
+        } else {
+            // If no habit is done, remove today from streak log
+            streakLog = streakLog.filter(date => date !== today);
+        }
+
+        localStorage.setItem("streakLog", JSON.stringify(streakLog));
         localStorage.setItem("habits", JSON.stringify(habits));
+
         renderHabits();
         updateProgress();
+        updateStreak();
     }
+
+
 
     function renderHabits() {
         habitList.innerHTML = "";
@@ -102,14 +215,39 @@ document.addEventListener("DOMContentLoaded", () => {
             name.className = "habit-name";
             name.textContent = habit.name;
 
+            const created = document.createElement("span");
+            created.className = "habit-created";
+
+            if (habit.createdAt) {
+                const date = new Date(habit.createdAt);
+                created.textContent = `🕒 Created: ${date.toLocaleDateString('en-GB', {
+                    day: 'numeric',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })}`;
+            } else {
+                created.textContent = "🕒 Created: N/A"; // fallback for old habits
+            }
+            ;
+
             if (habit.done) name.classList.add("done");
 
             infoDiv.appendChild(checkbox);
-            infoDiv.appendChild(name);
             infoDiv.appendChild(icon);
+            infoDiv.appendChild(name);
+            infoDiv.appendChild(created);
+
 
             const actionsDiv = document.createElement("div");
             actionsDiv.className = "habit-actions";
+
+            const editBtn = document.createElement("button");
+            editBtn.className = "edit-btn";
+            editBtn.textContent = "✏️";
+            editBtn.onclick = () => startEditHabit(habit);
+
+            actionsDiv.appendChild(editBtn);
 
             const delBtn = document.createElement("button");
             delBtn.className = "delete-btn";
@@ -124,13 +262,64 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    function updateStreak() {
+        const streakLog = JSON.parse(localStorage.getItem("streakLog")) || [];
+        const sortedDates = streakLog.sort().reverse(); // Latest first
+
+        let streak = 0;
+        let currentDate = new Date();
+
+        for (let i = 0; i < sortedDates.length; i++) {
+            const date = new Date(sortedDates[i]);
+            const diff = Math.floor((currentDate - date) / (1000 * 60 * 60 * 24));
+
+            if (diff === 0 || diff === 1) {
+                streak++;
+                currentDate.setDate(currentDate.getDate() - 1); // Go to previous day
+            } else {
+                break;
+            }
+        }
+
+        document.getElementById("streak-count").innerText = streak;
+    }
+
+
     function updateProgress() {
         const total = habits.length;
         const done = habits.filter(h => h.done).length;
         const percent = total === 0 ? 0 : Math.round((done / total) * 100);
 
+        // Count total done habits across all time
+        const totalCompleted = habits.filter(h => h.done).length;
+
+
+
         goalCount.innerText = `${done}/${total} Habits`;
         completionText.innerText = `${percent}%`;
+
+        // 🆕 Streak Logic
+        const today = new Date().toDateString(); // only date part
+        let streakData = JSON.parse(localStorage.getItem("streakData")) || {
+            streakCount: 0,
+            lastUpdatedDate: null
+        };
+
+        if (streakData.lastUpdatedDate !== today) {
+            if (done > 0) {
+                // continued streak
+                streakData.streakCount += 1;
+            } else {
+                // broke streak
+                streakData.streakCount = 0;
+            }
+            streakData.lastUpdatedDate = today;
+            localStorage.setItem("streakData", JSON.stringify(streakData));
+        }
+
+        document.getElementById("streak-count").innerText = streakData.streakCount;
+
+        updateAchievements(totalCompleted, streakData.streakCount);
 
         // --- Today Circular Chart ---
         if (circularChart) circularChart.destroy();
@@ -241,4 +430,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Initial render
     saveAndRenderHabits();
+    const initialAchievements = JSON.parse(localStorage.getItem("achievements")) || [];
+    renderAchievements(initialAchievements);
+    updateStreak();
 });
+
+
+function showToast(message) {
+    const container = document.getElementById("toast-container");
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    toast.innerText = message;
+    container.appendChild(toast);
+
+    // Auto-remove toast after animation
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}

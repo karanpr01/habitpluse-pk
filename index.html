@@ -34,7 +34,8 @@
                 </div>
 
                 <div class="goal-cards">
-                    <div class="card streak-card">🔥<br>Streak<br><strong><span id="streak-count">0 </span>Days</strong>
+                    <div class="card streak-card">🔥<br>Streak<br><strong><span id="streak-count">0 </span>
+                            Days</strong>
                     </div>
                     <div class="card goal-card">🎯<br>Daily Goal <br><strong id="goal-count">0/0 Habits</strong></div>
                 </div>
@@ -74,12 +75,12 @@
 
                 <div class="insight-charts">
 
-                      <!-- Bar Chart -->
+                    <!-- Bar Chart -->
                     <div class="chart-box bar-chart-box">
                         <canvas id="habitChart"></canvas>
                     </div>
 
-                    
+
                     <!-- Circular Chart -->
                     <div class="chart-box circular-box">
                         <canvas id="insightCircularChart"></canvas>
@@ -92,12 +93,17 @@
             </section>
 
             <section class="achievements">
-                <h2>Achievements</h2>
-                <div class="badges">🔥🎖️🏅</div>
+                <h2>🏆Achievements</h2>
+                <div id="achievement-badges" class="badges-container">
+                    None Yet 😢
+                </div>
             </section>
         </section>
 
         </section>
+
+        <!-- Toast Container -->
+        <div id="toast-container" class="toast-container"></div>
     </main>
 
     <!-- Footer -->
